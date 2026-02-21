@@ -1,0 +1,10 @@
+Python: C:\Users\divya\anaconda3\python.exe
+Version: 3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]
+
+cv2: 4.13.0
+flask: 3.0.3
+ultralytics: OK
+numpy: 2.2.6
+PIL: OK
+
+ALL IMPORTS OK — starting app...

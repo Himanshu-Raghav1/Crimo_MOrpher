@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Morph Studio</title>
+    <meta name="description" content="AI-powered face morphing web app using YOLO detection">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">🎭</span>
+            <h1>Face Morph <span class="accent">Studio</span></h1>
+        </div>
+        <p class="tagline">AI-Powered Face Morphing • YOLOv8 Detection</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Step 1: Capture / Upload -->
+        <section class="card capture-section" id="captureSection">
+            <div class="card-header">
+                <span class="step-badge">1</span>
+                <h2>Capture or Upload Photo</h2>
+            </div>
+            <div class="card-body">
+                <div class="video-container">
+                    <video id="webcam" autoplay playsinline></video>
+                    <canvas id="captureCanvas" style="display:none;"></canvas>
+                    <div class="video-overlay" id="videoOverlay">
+                        <span>📷 Click "Start Camera" to begin</span>
+                    </div>
+                </div>
+                <div class="capture-controls">
+                    <button class="btn btn-primary" id="btnStartCamera">
+                        <span class="btn-icon">📹</span> Start Camera
+                    </button>
+                    <button class="btn btn-accent" id="btnCapture" disabled>
+                        <span class="btn-icon">📸</span> Capture
+                    </button>
+                    <label class="btn btn-secondary upload-label">
+                        <span class="btn-icon">📁</span> Upload
+                        <input type="file" id="fileUpload" accept="image/*" hidden>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 2: Detection Result -->
+        <section class="card detection-section hidden" id="detectionSection">
+            <div class="card-header">
+                <span class="step-badge">2</span>
+                <h2>Face Detection</h2>
+            </div>
+            <div class="card-body">
+                <div class="image-display">
+                    <div class="image-box">
+                        <h3>Original</h3>
+                        <img id="originalImage" alt="Original photo">
+                    </div>
+                    <div class="image-box">
+                        <h3>Detected</h3>
+                        <img id="detectedImage" alt="Face detected">
+                    </div>
+                </div>
+                <div class="detection-info" id="detectionInfo"></div>
+            </div>
+        </section>
+
+        <!-- Step 3: Choose Effect -->
+        <section class="card effects-section hidden" id="effectsSection">
+            <div class="card-header">
+                <span class="step-badge">3</span>
+                <h2>Choose Morph Effect</h2>
+            </div>
+            <div class="card-body">
+                <div class="effects-grid" id="effectsGrid">
+                    <!-- Effects populated dynamically -->
+                </div>
+                <div class="strength-control">
+                    <label for="strengthSlider">Effect Strength</label>
+                    <input type="range" id="strengthSlider" min="0.1" max="2.0" step="0.1" value="1.0">
+                    <span id="strengthValue">1.0</span>
+                </div>
+
+                <!-- Criminal Background Toggle -->
+                <div class="bg-toggle-row">
+                    <label class="bg-toggle" for="criminalBgToggle">
+                        <input type="checkbox" id="criminalBgToggle">
+                        <span class="bg-toggle-track">
+                            <span class="bg-toggle-thumb"></span>
+                        </span>
+                        <span class="bg-toggle-label">
+                            <span class="bg-toggle-icon">🕷️</span>
+                            <span>
+                                <strong>Criminal Background</strong>
+                                <small>Replace background with police lineup scene</small>
+                            </span>
+                        </span>
+                    </label>
+                </div>
+                <div class="morph-action-row">
+                    <button class="btn btn-accent btn-large" id="btnApplyMorph">
+                        <span class="btn-icon">✨</span> Apply Morph
+                    </button>
+                    <button class="btn btn-random btn-large" id="btnSurpriseMe">
+                        <span class="btn-icon">🎲</span> Surprise Me!
+                    </button>
+                </div>
+                <p class="random-quote hidden" id="randomQuote"></p>
+            </div>
+        </section>
+
+        <!-- Step 4: Result -->
+        <section class="card result-section hidden" id="resultSection">
+            <div class="card-header">
+                <span class="step-badge">4</span>
+                <h2>Morphed Result</h2>
+            </div>
+            <div class="card-body">
+                <div class="image-display">
+                    <div class="image-box">
+                        <h3>Original</h3>
+                        <img id="resultOriginal" alt="Original">
+                    </div>
+                    <div class="arrow-divider">➜</div>
+                    <div class="image-box morphed-box">
+                        <h3>Morphed</h3>
+                        <img id="resultMorphed" alt="Morphed result">
+                    </div>
+                </div>
+                <div class="result-controls">
+                    <button class="btn btn-primary" id="btnDownload">
+                        <span class="btn-icon">💾</span> Download
+                    </button>
+                    <button class="btn btn-secondary" id="btnTryAnother">
+                        <span class="btn-icon">🔄</span> Try Another Effect
+                    </button>
+                    <button class="btn btn-random" id="btnRandomAgain">
+                        <span class="btn-icon">🎲</span> Random Again
+                    </button>
+                    <button class="btn btn-outline" id="btnReset">
+                        <span class="btn-icon">🔁</span> New Photo
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingText">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast hidden" id="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <footer class="footer">
+        <p>Built with YOLOv8 • OpenCV • Flask </p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
