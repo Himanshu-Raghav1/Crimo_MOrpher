@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Project specifics
+output/
+models/
+*.pt
+
+# Logs and Debug
+*.txt
+!requirements.txt
+*.log
+pkg_check.txt
+diag_log.txt
+flask_err.txt
+flask_out.txt
+startup_log.txt
+startup_log.txt
+test_run.py
+run_server.py
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
