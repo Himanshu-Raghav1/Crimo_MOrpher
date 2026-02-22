@@ -4,6 +4,9 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
+# Fix for Ultralytics non-writable config dir in Docker
+ENV YOLO_CONFIG_DIR=/tmp
+
 # Install system dependencies required by OpenCV and MediaPipe
 RUN apt-get update && apt-get install -y \
     libgl1 \
