@@ -1,15 +1,19 @@
 # Use official Python 3.10 slim image
 FROM python:3.10-slim
 
+# Set up a new user named "user" with user ID 1000
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH \
+    YOLO_CONFIG_DIR=/tmp \
+    PYTHONUNBUFFERED=1
+
 # Set working directory
-WORKDIR /app
+WORKDIR $HOME/app
 
-# IMPORTANT: Fix for Ultralytics non-writable config dir in Docker
-# We set it here so both the PRE-DOWNLOAD and the APP use it
-ENV YOLO_CONFIG_DIR=/tmp
-ENV PYTHONUNBUFFERED=1
-
-# Install system dependencies required by OpenCV and MediaPipe
+# Switch to root to install system dependencies
+USER root
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
@@ -19,27 +23,26 @@ RUN apt-get update && apt-get install -y \
     libgomp1 \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+USER user
 
 # Copy requirements first (for Docker layer caching)
-COPY requirements.txt .
+COPY --chown=user requirements.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Copy download_models script and run it to bake models into the image
-COPY download_models.py .
+# Copy download_models script and run it
+COPY --chown=user download_models.py .
 RUN python download_models.py
 
 # Copy all project files
-COPY . .
+COPY --chown=user . .
 
 # Create output directory
-RUN mkdir -p output
+RUN mkdir -p output && chown user:user output
 
-# Expose Flask port (Render uses $PORT, but we expose 5000 for local testing)
-EXPOSE 5000
+# Hugging Face Spaces uses Port 7860
+EXPOSE 7860
 
 # Use Gunicorn for production
-# -w 1: Single worker to save RAM on free tiers
-# --bind: Use the PORT environment variable
-CMD gunicorn -w 1 --bind 0.0.0.0:${PORT:-5000} app:app
+CMD gunicorn -w 1 --bind 0.0.0.0:7860 app:app
