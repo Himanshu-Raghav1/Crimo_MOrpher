@@ -4,8 +4,10 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
-# Fix for Ultralytics non-writable config dir in Docker
+# IMPORTANT: Fix for Ultralytics non-writable config dir in Docker
+# We set it here so both the PRE-DOWNLOAD and the APP use it
 ENV YOLO_CONFIG_DIR=/tmp
+ENV PYTHONUNBUFFERED=1
 
 # Install system dependencies required by OpenCV and MediaPipe
 RUN apt-get update && apt-get install -y \
@@ -15,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxext6 \
     libgomp1 \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first (for Docker layer caching)
